@@ -1,0 +1,6 @@
+*-bak
+_autosave-*
+fp-info-cache
+*.zip
+*.csv
+*.xml
