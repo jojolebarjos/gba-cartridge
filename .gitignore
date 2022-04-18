@@ -4,3 +4,9 @@ fp-info-cache
 *.zip
 *.csv
 *.xml
+*.asc
+*.bin
+*.blif
+*.dblite
+*.history
+*.out
