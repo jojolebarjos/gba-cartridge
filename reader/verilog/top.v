@@ -7,8 +7,8 @@ module top (
     output LED, // User/boot LED next to power LED
 
     // Cartridge
-    output CS,
-    output RD,
+    output reg CS,
+    output reg RD,
     output WR,
     inout [15:0] AD, // Cartridge bus
 
@@ -25,70 +25,78 @@ module top (
     // Turn off the LED
     assign LED = SCK;
 
+    // We never write anything to the cartridge
+    assign WR = 1;
+
     // Non-trivial I/O buffer handled using primitive
-    reg AD_write;
-    reg [15:0] AD_out;
-    wire [15:0] AD_in;
+    reg [15:0] A;
+    wire [15:0] D;
     SB_IO #(
         .PIN_TYPE(6'b1010_01),
         .PULLUP(1'b0)
     ) AD_io [15:0] (
         .PACKAGE_PIN(AD),
-        .OUTPUT_ENABLE(AD_write),
-        .D_OUT_0(AD_out),
-        .D_IN_0(AD_in)
+        .OUTPUT_ENABLE(RD),
+        .D_OUT_0(A),
+        .D_IN_0(D)
     );
 
     // Instanciate SPI module
-    reg [7:0] TX;
-    wire [7:0] RX;
+    reg [15:0] TX;
+    wire [15:0] RX;
     wire RDY;
     spi port (CLK, SCK, MOSI, MISO, SS, TX, RX, RDY);
 
-    // Internal state
-    reg[2:0] state;
-    reg[15:0] address;
-    reg[7:0] data;
-
-    // We never write anything
-    assign WR = 1;
-    assign CS = 1;
-    assign RD = 1;
-
-    // Always reply data to SPI requests
-    assign TX = data;
-
-    // State machine
+    // State machine is handled by master, here we just forward instructions
+    reg wait_for_address;
     always @(posedge CLK) begin
 
-        // When a byte was exchanged with host
-        AD_write <= 1'b0;
-        AD_out <= 16'b0000000000000000;
-        state <= 2'b00;
+        // Whenever a byte is received from SPI
         if (RDY) begin
-            case (state)
+            wait_for_address <= 0;
 
-            // Ready to handle new command
-            2'b00: begin
+            // Special case: we are expecting an address from master
+            if (wait_for_address) begin
+                A <= RX;
+                TX <= RX;
+            end
+
+            // Otherwise, this is a command
+            else begin
                 case (RX)
 
-                // SEEK
-                8'b00000001: begin
-                    // ...
+                // Set address
+                16'b0000000000000001: begin
+                    wait_for_address <= 1;
+                    TX <= 0;
                 end
 
-                // READ
-                8'b00000010: begin
-                    // ...
-                    data <= data + 1;
+                // Latch
+                16'b0000000000000010: begin
+                    CS <= 0;
+                    TX <= 0;
+                end
+
+                // Stop
+                16'b0000000000000011: begin
+                    CS <= 1;
+                    TX <= 0;
+                end
+
+                // Read
+                16'b0000000000000100: begin
+                    RD <= 0;
+                    TX <= 0;
+                end
+
+                // Step
+                16'b0000000000000101: begin
+                    RD <= 1;
+                    TX <= D;
                 end
 
                 endcase
             end
-
-            // TODO ... state is used for multi-byte address
-
-            endcase
         end
     end
 

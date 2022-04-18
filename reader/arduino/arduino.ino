@@ -23,7 +23,7 @@ void setup() {
   digitalWrite(SS, HIGH);
 }
 
-int transfer(int in) {
+uint16_t transfer(uint16_t in) {
 
   // Set Slave Select to low, to start message
   digitalWrite(SCK, LOW);
@@ -32,7 +32,7 @@ int transfer(int in) {
 
   // Exchange each bit, most significant bit first
   int out = 0;
-  for (int b = 7; b >= 0; --b) {
+  for (int b = 15; b >= 0; --b) {
 
     // Write bit at Serial Clock falling edge
     int b_in = (in >> b) & 1;
@@ -64,12 +64,13 @@ int transfer(int in) {
 
 void loop() {
 
-  // Wait for byte
-  int in = Serial.read();
-  if (in >= 0) {
-
-    // Exchange byte
-    int out = transfer(in);
-    Serial.write(out);
+  // Wait for message
+  if (Serial.available() >= 2) {
+    int high = Serial.read();
+    int low = Serial.read();
+    uint16_t in = high << 8 | low;
+    uint16_t out = transfer(in);
+    Serial.write(out >> 8);
+    Serial.write(out & 0xff);
   }
 }

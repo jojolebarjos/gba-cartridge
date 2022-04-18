@@ -2,38 +2,40 @@ import sys
 
 import serial
 
+from tqdm import tqdm
+
 
 name = sys.argv[1]
 
 with serial.Serial(name, 9600, timeout=1) as port:
 
-    CMD_SEEK = 0x01
-    CMD_READ = 0x02
-
     def transfer(value):
-        port.write(bytes([value]))
+        if isinstance(value, int):
+            assert 0 <= value < 65536
+            value = bytes([value >> 8, value & 0xff])
+        port.write(value)
         port.flush()
-        return port.read()
+        return port.read(2)
 
-    def seek(address):
-        if address < 0 or address >= (2 << 24):
-            raise ValueError(address)
-        if address >= (2 << 16):
-            raise NotImplementedError("current FPGA BX PCB does not support A16..23")
-        transfer(CMD_SEEK)
-        transfer(address & 0xff)
-        transfer((address >> 8) & 0xff)
-        transfer(CMD_READ)
+    SET = 0b001
+    LATCH = 0b010
+    STOP = 0b011
+    READ = 0b100
+    STEP = 0b101
 
-    def read():
-        return transfer(CMD_READ)
+    transfer(SET)
+    transfer(0x0000)
+    transfer(LATCH)
+    transfer(READ)
 
-    seek(0x0000)
     data = []
-    for i in range(128):
-        value = read()
-        data.append(value)
+    for i in tqdm(range(200)):
+        transfer(STEP)
+        result = transfer(READ)
+        # TODO swapping here, but is it the proper place for that?
+        data.append(result[1])
+        data.append(result[0])
 
-    print(data)
+    transfer(STOP)
 
-
+    data = bytes(data)
