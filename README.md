@@ -3,7 +3,7 @@
 
 This project is about making homebrew cartridges for the GameBoy Advance, using an FPGA (here a [TinyFPGA](https://tinyfpga.com/) BX).
 Given the update frequency (and the fact that both falling-edges and rising-edges are meaningful), this is more convenient than bit-banging using some micro-controller.
-A few experiments are available, some making use of an additional micro-controller (here an [Arduino Nano 33 BLE](https://store.arduino.cc/products/arduino-nano-33-ble))for communication.
+A few experiments are available, some making use of an additional micro-controller (here an [Arduino Nano 33 BLE](https://store.arduino.cc/products/arduino-nano-33-ble)) for communication.
 
 
 ## Cartridge protocol
@@ -14,10 +14,10 @@ The cartridge has the following pins:
  * 2: `PHI`, the physical clock, which can be configured (disabled, 4.19MHz, 8.38MHz, 16.78MHz). Disabled by default. See [waitstate control](https://www.akkit.org/info/gbatek.htm#gbasystemcontrol).
  * 3: `~WR`, write control.
  * 4: `~RD`, read control.
- * 5: `~CS`, select.
+ * 5: `~CS`, select ROM.
  * 6-21: `AD`, address and data.
  * 22-29: `A`, address or data.
- * 30: `CS2`, select.
+ * 30: `CS2`, select SRAM.
  * 31: `IRQ`, interrupt request. Can be left unconnected or grounded.
  * 32: `GND`, ground.
 
@@ -37,7 +37,7 @@ A read access from the ROM is done as follows:
  * On `~CS` rising-edge, the transaction is done.
 
 Note that ROM data is 16-bits, hence data is aligned on 2-bytes steps.
-This means the implicit first bit of the address is always 0 (i.e. A0-A23 is the address divided by 2).
+This means the implicit least-significant bit of the address is always 0 (i.e. A0-A23 is the address divided by 2).
 
 Therefore, a simple read-only GamePak ROM does not use `PHI`, `~WR`, `~CS2` and `IRQ`.
 
@@ -45,7 +45,7 @@ It should also be possible to write to ROM, using a similar scheme, but with `~W
 To be tested.
 
 Also note that the `AD` bus is used in both direction.
-The cartridge should actively write only when both `~CS` and `~WR` are low.
+The cartridge should actively write only when both `~CS` and `~RD` are low.
 
 Relevant links:
 
@@ -68,7 +68,7 @@ Relevant links:
  * https://github.com/uXeBoy/GBArduboy
 
 
-## Making a game
+## Compiling a GameBoy Advance game
 
 The GameBoy Advance features an ARM-based processor.
 We will use [devkitPro](https://devkitpro.org/wiki/Main_Page) to compile binaries.
@@ -79,7 +79,7 @@ We share the local folder with the container, to avoid unnecessary copies.
 ```
 # Run in interactive mode
 docker run -ti -v ${PWD}:/rom devkitpro/devkitarm
-#docker run -ti -v %cd%:/rom devkitpro/devkitarm
+# On Windows: docker run -ti -v %cd%:/rom devkitpro/devkitarm
 
 # Add compiler binaries to path
 export PATH="/opt/devkitpro/devkitARM/bin/:$PATH"
@@ -211,7 +211,7 @@ This is a naive implementation of the above-mentioned protocol:
  * The Arduino acts as a bridge, communicating with the FPGA using SPI and with the computer using USB.
  * A Python script sends the commands and dumps the content to a binary file.
 
-See [`./reader/](./reader/) for more details.
+See [`./reader/`](./reader/) for more details.
 
 
 ### Minimal cartridge
@@ -221,4 +221,4 @@ A simple "game" is provided, where a white dot is moved using the arrows.
 
 ![Hardware setup](image/minimal.jpg)
 
-See [`./minimal/](./minimal/) for more details.
+See [`./minimal/`](./minimal/) for more details.
