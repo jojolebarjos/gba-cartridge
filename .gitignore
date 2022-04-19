@@ -14,3 +14,4 @@ fp-info-cache
 *.elf.map
 *.d
 *.o
+*.FCStd1
