@@ -1,16 +1,16 @@
 
 #include <stdint.h>
 
-#define REG_DISPLAYCONTROL   *((volatile uint32_t*)0x04000000)
+#define REG_DISPLAYCONTROL   *((volatile uint32_t *)0x04000000)
 #define VIDEOMODE_3          0x0003
 #define BGMODE_2             0x0400
 
-#define REG_VCOUNT           *((volatile uint16_t*)0x04000006)
-#define MEM_VRAM             ((volatile uint16_t*)0x06000000)
+#define REG_VCOUNT           *((volatile uint16_t *)0x04000006)
+#define MEM_VRAM             ((volatile uint16_t *)0x06000000)
 #define SCREEN_WIDTH         240
 #define SCREEN_HEIGHT        160
 
-#define REG_KEYINPUT         *((volatile uint32_t*)0x04000130)
+#define REG_KEYINPUT         *((volatile uint16_t *)0x04000130)
 
 #define KEY_RIGHT            (1 << 4)
 #define KEY_LEFT             (1 << 5)
@@ -38,7 +38,7 @@ void vsync(void) {
 // Entry point
 int main(void) {
     int i;
-    uint32_t keyinput;
+    uint16_t keyinput;
     int x, y;
 
     // Start at center
@@ -73,9 +73,6 @@ int main(void) {
             y += 1;
         if ((keyinput & KEY_UP) == 0)
             y -= 1;
-
-        x *= -1;
-        y *= -1;
 
         // Warp around, if needed
         if (x < 0)
