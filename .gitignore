@@ -10,3 +10,7 @@ fp-info-cache
 *.dblite
 *.history
 *.out
+*.elf
+*.elf.map
+*.d
+*.o

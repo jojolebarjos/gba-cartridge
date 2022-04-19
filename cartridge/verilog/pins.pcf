@@ -1,0 +1,115 @@
+###############################################################################
+#
+# TinyFPGA BX constraint file (.pcf)
+#
+###############################################################################
+#
+# Copyright (c) 2018, Luke Valenty
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# The views and conclusions contained in the software and documentation are those
+# of the authors and should not be interpreted as representing official policies,
+# either expressed or implied, of the <project name> project.
+#
+###############################################################################
+
+####
+# TinyFPGA BX information: https://github.com/tinyfpga/TinyFPGA-BX/
+####
+
+# Left side of board
+set_io --warn-no-port PIN_1 A2
+set_io --warn-no-port PIN_2 A1
+set_io --warn-no-port PIN_3 B1
+set_io --warn-no-port PIN_4 C2
+set_io --warn-no-port PIN_5 C1
+set_io --warn-no-port PIN_6 D2
+set_io --warn-no-port PIN_7 D1
+set_io --warn-no-port PIN_8 E2
+set_io --warn-no-port PIN_9 E1
+set_io --warn-no-port PIN_10 G2
+set_io --warn-no-port PIN_11 H1
+set_io --warn-no-port PIN_12 J1
+set_io --warn-no-port PIN_13 H2
+
+# Right side of board
+set_io --warn-no-port PIN_14 H9
+set_io --warn-no-port PIN_15 D9
+set_io --warn-no-port PIN_16 D8
+set_io --warn-no-port PIN_17 C9
+set_io --warn-no-port PIN_18 A9
+set_io --warn-no-port PIN_19 B8
+set_io --warn-no-port PIN_20 A8
+set_io --warn-no-port PIN_21 B7
+set_io --warn-no-port PIN_22 A7
+set_io --warn-no-port PIN_23 B6
+set_io --warn-no-port PIN_24 A6
+
+# SPI flash interface on bottom of board
+set_io --warn-no-port SPI_SS F7
+set_io --warn-no-port SPI_SCK G7
+set_io --warn-no-port SPI_IO0 G6
+set_io --warn-no-port SPI_IO1 H7
+set_io --warn-no-port SPI_IO2 H4
+set_io --warn-no-port SPI_IO3 J8
+
+# General purpose pins on bottom of board
+set_io --warn-no-port PIN_25 G1
+set_io --warn-no-port PIN_26 J3
+set_io --warn-no-port PIN_27 J4
+set_io --warn-no-port PIN_28 G9
+set_io --warn-no-port PIN_29 J9
+set_io --warn-no-port PIN_30 E8
+set_io --warn-no-port PIN_31 J2
+
+# LED
+set_io --warn-no-port LED B3
+
+# USB
+set_io --warn-no-port USBP B4
+set_io --warn-no-port USBN A4
+set_io --warn-no-port USBPU A3
+
+# 16MHz clock
+set_io --warn-no-port CLK B2 # input
+
+# Cartridge
+set_io --warn-no-port AD[0] D2 # PIN_6
+set_io --warn-no-port AD[2] D1 # PIN_7
+set_io --warn-no-port AD[4] E2 # PIN_8
+set_io --warn-no-port AD[6] E1 # PIN_9
+set_io --warn-no-port AD[8] G2 # PIN_10
+set_io --warn-no-port AD[10] H1 # PIN_11
+set_io --warn-no-port AD[12] J1 # PIN_12
+set_io --warn-no-port AD[14] H2 # PIN_13
+set_io --warn-no-port AD[15] H9 # PIN_14
+set_io --warn-no-port AD[13] D9 # PIN_15
+set_io --warn-no-port AD[11] D8 # PIN_16
+set_io --warn-no-port AD[9] C9 # PIN_17
+set_io --warn-no-port AD[7] A9 # PIN_18
+set_io --warn-no-port AD[5] B8 # PIN_19
+set_io --warn-no-port AD[3] A8 # PIN_20
+set_io --warn-no-port AD[1] B7 # PIN_21
+set_io --warn-no-port CS A7 # PIN_22
+set_io --warn-no-port RD B6 # PIN_23
+set_io --warn-no-port WR A6 # PIN_24
