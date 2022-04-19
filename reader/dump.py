@@ -39,3 +39,6 @@ with serial.Serial(name, 9600, timeout=1) as port:
     transfer(STOP)
 
     data = bytes(data)
+
+    with open("dump.bin", "wb") as file:
+        file.write(data)
