@@ -25,9 +25,12 @@ General comments about memory accesses:
 
  * Data format is always little endian, i.e. least significant byte is first.
  * Depending on the requested (virtual) address and operation, the GameBoy will either assume ROM or RAM when accessing the cartridge.
- * Since GamePak ROM bus is 16-bits, ARM instructions (32-bits) are slow to fetch. It is better to use THUMB instructions, or copy the code in WRAM.
+ * ROM data access is 16-bits, hence data is aligned on 2-bytes steps. This means the implicit least-significant bit of the address is always 0 (i.e. `A0..23` is the address divided by 2).
+ * ARM instructions (32-bits) are slow to fetch. It is better to use THUMB instructions, or copy the code in WRAM.
  * GamePak accesses can be either sequential or non-sequential. The first access to a random location in ROM must be non-sequential.
  * The GameBoy will wait a few cycles when accessing memory. Up to 3 configurations can be used (useful if the cartridge has multiple ROM units with different physical properties). By default, it will assume 4 cycles for random access, and then 2 cycles for sequential access. See [waitstate control](https://www.akkit.org/info/gbatek.htm#gbasystemcontrol).
+ * When doing ROM access, the `AD` bus is used in both direction. The cartridge should actively write only when both `~CS` and `~RD` are low.
+ * When doing RAM access, the `AD` bus is used for the 16-bits address, and the 8-bits data is returned through `A16..23`. `~CS2` is used instead of `~CS`.
 
 A read access from the ROM is done as follows:
 
@@ -36,36 +39,51 @@ A read access from the ROM is done as follows:
  * On `~RD` rising-edge, the cartridge increments latched address by one (i.e. allow sequential read by just strobing `~RD`).
  * On `~CS` rising-edge, the transaction is done.
 
-Note that ROM data is 16-bits, hence data is aligned on 2-bytes steps.
-This means the implicit least-significant bit of the address is always 0 (i.e. A0-A23 is the address divided by 2).
+While it usually makes no sense to write to a ROM, the GameBoy will submit write commands in a similar fashion, toggling `~WR` instead.
+In this project, we use that to let the software write back to the cartridge, for instance to report key input.
 
 Therefore, a simple read-only GamePak ROM does not use `PHI`, `~WR`, `~CS2` and `IRQ`.
 
-It should also be possible to write to ROM, using a similar scheme, but with `~WR` instead of `~RD`.
-To be tested.
-
-Also note that the `AD` bus is used in both direction.
-The cartridge should actively write only when both `~CS` and `~RD` are low.
+Cartridges that require more than 64K of storage will need to use bank switching to map more memory.
+This topic has not been investigated in this project.
 
 Relevant links:
 
- * https://www.gbadev.org/
- * https://www.akkit.org/info/gbatek.htm#auxgbagamepakbus
- * https://www.darkfader.net/gba/
- * http://files.darkfader.net/gba/files/cartridge.txt
- * https://douevenknow.us/post/68126856498/arduino-based-gba-rom-dumper-part-1
- * https://reinerziegler.de.mirrors.gg8.se/GBA/gba.htm
- * https://dhole.github.io/post/gameboy_cartridge_emu_1/
- * https://retrocomputing.stackexchange.com/questions/11732/how-does-the-gameboys-memory-bank-switching-work
- * http://www.dl9sec.de/prj_gbacart.html
- * https://github.com/uXeBoy/GBA
- * http://bitwise.bperki.com/2018/08/08/custom-game-boy-cartridge-project-update-1/
- * https://www.insidegadgets.com/2018/04/18/building-a-2mb-mbc5-gameboy-cart-part-1-cpld-as-the-mbc-and-adding-flash-as-our-rom/
- * https://github.com/dwaq/Homebrew-Gameboy-Cartridge
- * http://www.hardwarebook.info/Game_Pak
- * https://www.insidegadgets.com/2011/03/19/gbcartread-arduino-based-gameboy-cart-reader-%E2%80%93-part-1-read-the-rom/
- * https://github.com/Shyri/gba-bt-hid
- * https://github.com/uXeBoy/GBArduboy
+ * References
+   * https://github.com/gbadev-org/awesome-gbadev
+   * https://www.gbadev.org/
+   * https://www.akkit.org/info/gbatek.htm
+   * https://problemkaputt.de/gbatek.htm
+   * http://www.hardwarebook.info/Game_Pak
+ * Blogs and websites
+   * https://gekkio.fi/
+     * https://gekkio.fi/files/gb-docs/gbctr.pdf
+     * https://github.com/gekkio/gb-hardware
+   * https://www.darkfader.net/gba/
+     * http://files.darkfader.net/gba/files/cartridge.txt
+   * https://reinerziegler.de.mirrors.gg8.se/GBA/gba.htm
+   * http://kylehalladay.com/blog/tutorial/gba/2017/04/18/GBA-By-Example-4.html
+   * https://fabiensanglard.net/another_world_polygons_GBA/
+   * https://github.com/PeterLemon/GBA
+ * Custom cartridges
+   * https://github.com/uXeBoy/GBA
+   * https://github.com/uXeBoy/GBArduboy
+   * http://www.dl9sec.de/prj_gbacart.html
+ * Cartridge reader
+   * https://www.insidegadgets.com/2011/03/19/gbcartread-arduino-based-gameboy-cart-reader-%E2%80%93-part-1-read-the-rom/
+   * https://douevenknow.us/post/68126856498/arduino-based-gba-rom-dumper-part-1
+   * https://dragaosemchama.com/en/2015/12/gameboy-pak-reader-cartridge-header/
+   * https://mgba.io/2015/10/20/dumping-the-undumped/
+ * Multiboot-based
+   * https://github.com/Shyri/gba-bt-hid
+ * Old GameBoy, but still very interesting
+   * https://dhole.github.io/post/gameboy_cartridge_emu_1/
+   * https://retrocomputing.stackexchange.com/questions/11732/how-does-the-gameboys-memory-bank-switching-work
+   * https://github.com/dwaq/Homebrew-Gameboy-Cartridge
+   * https://www.insidegadgets.com/2018/04/18/building-a-2mb-mbc5-gameboy-cart-part-1-cpld-as-the-mbc-and-adding-flash-as-our-rom/
+   * http://bitwise.bperki.com/2018/08/08/custom-game-boy-cartridge-project-update-1/
+   * https://wiki.tauwasser.eu/view/MBC1
+   * https://catskull.net/gameboy-boot-screen-logo.html
 
 
 ## Compiling a GameBoy Advance game
@@ -98,12 +116,14 @@ Links related to GBA software development:
  * http://kylehalladay.com/blog/tutorial/gba/2017/03/28/GBA-By-Example-1.html
  * https://www.coranac.com/tonc/text/setup.htm#sec-dkp
  * https://www.akkit.org/info/gbatek.htm#gbakeypadinput
+ * https://www.coranac.com/tonc/text/keys.htm
+ * https://github.com/felixjones/gba-plusplus
 
 Emulators and GameBoy implementations:
 
- * [mGBA](https://mgba.io/)
- * No$GBA
- * [FPGBA](https://github.com/RobertPeip/FPGBA)
+ * https://mgba.io/
+ * https://github.com/RobertPeip/FPGBA
+ * https://github.com/AntonioND/giibiiadvance
 
 
 ## Development PCB
@@ -222,3 +242,12 @@ A simple "game" is provided, where a white dot is moved using the arrows.
 ![Hardware setup](image/minimal.jpg)
 
 See [`./minimal/`](./minimal/) for more details.
+
+
+### USB gamepad
+
+...
+
+TODO: use interrupts on GBA (and sleep when no button is pressed)
+
+TODO: make FPGA the SPI master, or use interrupts to let the Arduino communicate only when needed
