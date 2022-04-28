@@ -124,6 +124,7 @@ Emulators and GameBoy implementations:
  * https://mgba.io/
  * https://github.com/RobertPeip/FPGBA
  * https://github.com/AntonioND/giibiiadvance
+ * https://mitxela.com/projects/swotgb/about
 
 
 ## Development PCB
@@ -138,6 +139,8 @@ Depending on whether a GameBoy Advance and/or a cartridge is used, the FPGA can 
  * A dedicated header is available to configure power supply.
  * `A` is not exposed to the TinyFPGA BX, as there are not enough pins. Note that some GPIO pins are exposed as pads by the FPGA, but this is not convenient for this project.
  * Instead, some pins are exposed as "extra", and can be used either for external communication (e.g. SPI) or connected to `A` to extend the address space.
+ * Use ENIG finish (i.e. *not* HASL), for more strength.
+ * In order to fit in the opening, a thickness of 0.8mm should be used (as the casing already takes roughly 1mm).
 
 See the [schema](pcb.sch.pdf) for more details.
 
