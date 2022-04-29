@@ -48,7 +48,8 @@ int main(void) {
     // Set wait states 0 to minimum
     REG_WSCNT = WS_ROM0_N2 | WS_ROM0_S1;
 
-    // Copy image
+    // Copy image using Direct Memory Access
+    // Note: channel 3 is for general purpose
     REG_DMA[3].count = 0;
     REG_DMA[3].src = image;
     REG_DMA[3].dst = MEM_VRAM;

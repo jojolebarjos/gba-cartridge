@@ -234,7 +234,7 @@ This is a naive implementation of the above-mentioned protocol:
  * The Arduino acts as a bridge, communicating with the FPGA using SPI and with the computer using USB.
  * A Python script sends the commands and dumps the content to a binary file.
 
-See [`./reader/`](./reader/) for more details.
+See [`./experiments/reader/`](./reader/) for more details.
 
 
 ### Minimal cartridge
@@ -244,7 +244,7 @@ A simple "game" is provided, where a white dot is moved using the arrows.
 
 ![Hardware setup](image/minimal.jpg)
 
-See [`./minimal/`](./minimal/) for more details.
+See [`./experiments/minimal/`](./minimal/) for more details.
 
 
 ### USB gamepad
@@ -254,3 +254,28 @@ See [`./minimal/`](./minimal/) for more details.
 TODO: use interrupts on GBA (and sleep when no button is pressed)
 
 TODO: make FPGA the SPI master, or use interrupts to let the Arduino communicate only when needed
+
+
+### Direct Memory Access
+
+...
+
+See [`./experiments/dma/`](./dma/) for more details.
+
+
+### VGA
+
+The GBA has a TFT color LCD that is 240 x 160 pixels in size and has a refresh rate of exactly 280896 cpu cycles per frame, or around 59.73 hz.
+Most GBA programs will need to structure themselves around this refresh rate.
+The LCD can display 15-bit RGB colors (0bxbbbbbgggggrrrrr).
+
+HDMI and VGA are closely related...
+
+The closest standard mode is 720x480 @60Hz RGB 4:4:4
+
+ * https://en.wikipedia.org/wiki/Video_Graphics_Array
+ * https://en.wikipedia.org/wiki/HDMI
+ * https://www.youtube.com/watch?v=l7rce6IQDWs&ab_channel=BenEater
+ * http://tinyvga.com/vga-timing
+ * https://ez.analog.com/cfs-file/__key/telligent-evolution-components-attachments/00-317-00-00-00-05-21-37/HDMISpecification13a.pdf
+ * https://forum.digikey.com/t/vga-controller-vhdl/12794
