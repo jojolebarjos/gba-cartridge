@@ -109,7 +109,7 @@ make
 
 Links related to GBA software development:
 
- * https://www.coranac.com/tonc/text/setup.htm
+ * https://www.coranac.com/tonc/text/toc.htm
  * https://devkitpro.org/wiki/Getting_Started
  * https://github.com/devkitPro/docker
  * https://github.com/devkitPro/gba-examples
@@ -212,11 +212,11 @@ Links:
 A few simple experiments have been made until now.
 
 
-### Cartridge reader
+### Cartridge dump
 
 An Arduino Nano 33 BLE is connected to a TinyFPGA BX over SPI.
 
-![Hardware setup](image/reader.jpg)
+![Hardware setup](image/dump.jpg)
 
 | Name | Arduino Nano 33 BLE | Wire | Board | TinyFPGA BX |
 | ---- | ---- | ---- | ---- | ---- |
@@ -234,17 +234,28 @@ This is a naive implementation of the above-mentioned protocol:
  * The Arduino acts as a bridge, communicating with the FPGA using SPI and with the computer using USB.
  * A Python script sends the commands and dumps the content to a binary file.
 
-See [`./experiments/reader/`](./reader/) for more details.
+Note that this approach does not handle any memory bank.
+Therefore, it cannot be used as-is to dump a whole cartridge.
+
+See [`./experiments/dump/`](./dump/) for more details.
 
 
-### Minimal cartridge
+### Read-only cartridge
 
 The TinyFPGA BX acts as a read-only ROM cartridge.
 A simple "game" is provided, where a white dot is moved using the arrows.
 
-![Hardware setup](image/minimal.jpg)
+![Hardware setup](image/read.jpg)
 
-See [`./experiments/minimal/`](./minimal/) for more details.
+See [`./experiments/read/`](./read/) for more details.
+
+
+### Read-write
+
+The TinyFPGA BX acts as a writable ROM cartridge.
+A simple "game" is provided, where buttons are written at each frame to the cartridge memory.
+
+See [`./experiments/write/`](./write/) for more details.
 
 
 ### USB gamepad
@@ -260,6 +271,11 @@ TODO: make FPGA the SPI master, or use interrupts to let the Arduino communicate
 
 ...
 
+http://problemkaputt.de/gbatek-gba-dma-transfers.htm
+https://gbdev.gg8.se/wiki/articles/Video_Display
+https://austinjadams.com/blog/autograding-gba-dma/
+https://badd10de.dev/notes/gba-programming.html
+
 See [`./experiments/dma/`](./dma/) for more details.
 
 
@@ -269,7 +285,13 @@ The GBA has a TFT color LCD that is 240 x 160 pixels in size and has a refresh r
 Most GBA programs will need to structure themselves around this refresh rate.
 The LCD can display 15-bit RGB colors (0bxbbbbbgggggrrrrr).
 
-HDMI and VGA are closely related...
+TODO:
+ * Use backbuffer (with palette) mode 4, to acquire next frame during previous one is drawn
+ * VGA is an analog signal, with 5 (+GND) relevant pins: R, G, B, H-Sync, V-Sync
+ * We can naively connect these to digital inputs, effectively displaying only 8 colors
+ * We can also use an analog-to-digital serial converter, if FPGA is fast enough
+ * https://electronics.stackexchange.com/questions/134674/how-vga-monitor-detects-video-resolution
+ * Need 3:2 resolution, so maybe use 320x200 and trim 20 pixels horizontally? https://www.videotechnology.com/0904/formats.html
 
 The closest standard mode is 720x480 @60Hz RGB 4:4:4
 
