@@ -260,11 +260,19 @@ See [`./experiments/write/`](./write/) for more details.
 
 ### USB gamepad
 
-...
+The TinyFPGA BX acts as a writable ROM cartridge.
+A simple "game" is provided, where buttons are written at each frame to the cartridge memory.
+This information is then forwarded to an Arduino Nano 33 BLE, which is recognized as a HID gamepad.
+
+![Hardware setup](image/gamepad.jpg)
+
+TODO: use HID over USB/BLE
 
 TODO: use interrupts on GBA (and sleep when no button is pressed)
 
 TODO: make FPGA the SPI master, or use interrupts to let the Arduino communicate only when needed
+
+See [`./experiments/gamepad/`](./gamepad/) for more details.
 
 
 ### Direct Memory Access
